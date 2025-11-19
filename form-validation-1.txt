@@ -1,0 +1,187 @@
+ASSIGNMENT NO.1
+1. Design a student HTML form validate using JavaScript
+StudentForm.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Registration Form</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="form-container">
+<h2>Student Registration Form</h2>
+<form id="registrationForm" novalidate>
+<div class="form-group">
+<label for="name">Full Name:</label>
+<input type="text" id="name" name="name" required>
+<small class="error-message" id="nameError"></small>
+</div>
+<div class="form-group">
+<label for="email">Email Address:</label>
+<input type="text" id="email" name="email" required>
+<small class="error-message" id="emailError"></small>
+</div>
+<div class="form-group">
+<label for="phone">Phone Number:</label>
+<input type="text" id="phone" name="phone" required>
+<small class="error-message" id="phoneError"></small>
+</div>
+<div class="form-group">
+<label for="dob">Date of Birth:</label>
+<input type="date" id="dob" name="dob" required min="2000-01-01">
+<!-- <input type="date" id="dob" name="dob" required> -->
+<small class="error-message" id="dobError"></small>
+</div>
+<button type="submit">Register</button>
+</form>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
+
+Style.css
+body {
+font-family: Arial, sans-serif;
+background: #f0f2f5;
+display: flex;
+justify-content: center;
+align-items: center;
+height: 100vh;
+}
+.form-container {
+background-color: white;
+padding: 30px;
+border-radius: 8px;
+box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.1);
+width: 350px;
+}
+h2 {
+text-align: center;
+margin-bottom: 20px;
+}
+.form-group {
+margin-bottom: 15px;
+display: flex;
+flex-direction: column;
+}
+label {
+margin-bottom: 5px;
+font-weight: bold;
+}
+input[type="text"],
+input[type="date"] {
+padding: 10px;
+border: 1px solid #ccc;
+border-radius: 5px;
+}
+button {
+width: 100%;
+padding: 10px;
+background-color: #007bff;
+color: white;
+font-size: 16px;
+border: none;
+
+border-radius: 5px;
+cursor: pointer;
+}
+button:hover {
+background-color: #0056b3;
+}
+.error-message {
+color: red;
+font-size: 12px;
+display: none;
+}
+script.js
+// Set max DOB to today - 18 years
+window.onload = function () {
+const dobInput = document.getElementById("dob");
+const today = new Date();
+const year = today.getFullYear() - 18;
+const month = String(today.getMonth() + 1).padStart(2, '0');
+const day = String(today.getDate()).padStart(2, '0');
+const maxDate = `${year}-${month}-${day}`;
+dobInput.max = maxDate;
+};
+document.getElementById("registrationForm").addEventListener("submit", function(event) {
+event.preventDefault(); // Prevent form submission
+// Clear previous errors
+clearErrors();
+// Get field values
+const name = document.getElementById("name").value.trim();
+const email = document.getElementById("email").value.trim();
+const phone = document.getElementById("phone").value.trim();
+const dob = document.getElementById("dob").value;
+let isValid = true;
+// 1. Required Fields
+if (name === "") {
+showError("nameError", "Name is required.");
+isValid = false;
+}
+
+if (email === "") {
+showError("emailError", "Email is required.");
+isValid = false;
+}
+if (phone === "") {
+showError("phoneError", "Phone number is required.");
+isValid = false;
+}
+if (dob === "") {
+showError("dobError", "Date of birth is required.");
+isValid = false;
+}
+// 2. Email Format
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+if (email && !emailPattern.test(email)) {
+showError("emailError", "Enter a valid email address.");
+isValid = false;
+}
+// 3. Phone Number Validation
+const phonePattern = /^\d{10}$/;
+if (phone && !phonePattern.test(phone)) {
+showError("phoneError", "Phone number must be exactly 10 digits.");
+isValid = false;
+}
+// 4. Age Check (18+)
+if (dob) {
+const today = new Date();
+const birthDate = new Date(dob);
+let age = today.getFullYear() - birthDate.getFullYear();
+const monthDiff = today.getMonth() - birthDate.getMonth();
+if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+age--;
+}
+if (age < 18) {
+showError("dobError", "You must be at least 18 years old.");
+isValid = false;
+}
+// Ensure DOB is not before year 2000
+const minDOB = new Date("2000-01-01");
+if (birthDate < minDOB) {
+
+showError("dobError", "Date of birth cannot be before the year 2000.");
+isValid = false;
+}
+}
+if (isValid) {
+alert("Form submitted successfully!");
+document.getElementById("registrationForm").reset();
+}
+});
+function showError(id, message) {
+const element = document.getElementById(id);
+element.textContent = message;
+element.style.display = "block";
+}
+function clearErrors() {
+const errorMessages = document.querySelectorAll(".error-message");
+errorMessages.forEach(msg => {
+msg.textContent = "";
+msg.style.display = "none";
+});
+}
+
+

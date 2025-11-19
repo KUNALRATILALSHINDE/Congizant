@@ -1,0 +1,320 @@
+ASSIGNMENT NO. 6
+6. Develop a simple JSP application to update student information in MySQL
+searchStudent.jsp
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Search Student</title>
+<style>
+body { font-family: Arial; margin: 40px; background: #f4f4f4; }
+.container { max-width: 500px; margin: 0 auto; background: white; padding: 30px;
+border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+h2 { color: #333; text-align: center; margin-bottom: 30px; }
+.form-group { margin-bottom: 20px; }
+label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+input[type="text"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius:
+4px; font-size: 16px; box-sizing: border-box; }
+input[type="submit"] { background: #007bff; color: white; padding: 12px 20px; border:
+none; border-radius: 4px; cursor: pointer; font-size: 16px; width: 100%; }
+input[type="submit"]:hover { background: #0056b3; }
+.error { color: red; text-align: center; margin-top: 10px; padding: 10px; background:
+#ffe6e6; border-radius: 4px; }
+.success { color: green; text-align: center; margin-top: 10px; padding: 10px; background:
+#e6ffe6; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="container">
+<h2>Search Student by Roll Number</h2>
+
+<%
+String success = request.getParameter("success");
+if (success != null && success.equals("true")) {
+%>
+<div class="success">Student information updated successfully!</div>
+<%
+}
+%>
+
+<%
+String error = (String) request.getAttribute("error");
+if (error != null) {
+%>
+<div class="error"><%= error %></div>
+<%
+}
+%>
+
+<form action="SearchStudent" method="post">
+<div class="form-group">
+<label for="rollNumber">Enter Roll Number:</label>
+<input type="text" id="rollNumber" name="rollNumber" required
+placeholder="Example: 1">
+</div>
+<input type="submit" value="Search Student">
+</form>
+
+</div>
+</body>
+</html>
+updateStudent.jsp
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF8"%>
+<%
+// Get attributes set by the servlet
+String rollNumber = (String) request.getAttribute("rollNumber");
+String firstName = (String) request.getAttribute("firstName");
+String lastName = (String) request.getAttribute("lastName");
+String gender = (String) request.getAttribute("gender");
+String mobileNumber = (String) request.getAttribute("mobileNumber");
+String collegeName = (String) request.getAttribute("collegeName");
+String academicYear = (String) request.getAttribute("academicYear");
+
+if (rollNumber == null) {
+response.sendRedirect("searchStudent.jsp");
+return;
+}
+%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Update Student</title>
+<style>
+body { font-family: Arial; margin: 40px; background: #f4f4f4; }
+.container { max-width: 600px; margin: 0 auto; background: white; padding: 30px;
+border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+
+h2 { color: #333; text-align: center; margin-bottom: 30px; }
+.form-group { margin-bottom: 20px; }
+label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+input[type="text"], select { width: 100%; padding: 10px; border: 1px solid #ddd; borderradius: 4px; font-size: 16px; box-sizing: border-box; }
+input[readonly] { background: #f5f5f5; color: #666; }
+.button-group { display: flex; gap: 10px; margin-top: 30px; }
+input[type="submit"], .btn { padding: 12px 20px; border: none; border-radius: 4px;
+cursor: pointer; font-size: 16px; text-decoration: none; text-align: center; flex: 1; }
+.btn-primary { background: #007bff; color: white; }
+.btn-primary:hover { background: #0056b3; }
+.btn-secondary { background: #6c757d; color: white; }
+.btn-secondary:hover { background: #545b62; }
+.student-info { background: #f8f9fa; padding: 15px; border-radius: 4px; margin-bottom:
+20px; }
+</style>
+</head>
+<body>
+<div class="container">
+<h2>Update Student Information</h2>
+
+<div class="student-info">
+<strong>Roll Number:</strong> <%= rollNumber %><br>
+<strong>Current Name:</strong> <%= firstName %> <%= lastName %><br>
+<strong>Gender:</strong> <%= gender %><br>
+<strong>College:</strong> <%= collegeName %>
+</div>
+
+<form action="UpdateStudent" method="post">
+<input type="hidden" name="rollNumber" value="<%= rollNumber %>">
+
+<div class="form-group">
+<label for="rollNumberDisplay">Roll Number (Cannot be changed):</label>
+<input type="text" id="rollNumberDisplay" value="<%= rollNumber %>" readonly>
+</div>
+
+<div class="form-group">
+<label for="firstName">First Name *:</label>
+<input type="text" id="firstName" name="firstName" value="<%= firstName %>"
+required>
+</div>
+
+<div class="form-group">
+<label for="lastName">Last Name (Display only):</label>
+<input type="text" id="lastName" value="<%= lastName %>" readonly>
+</div>
+
+<div class="form-group">
+<label for="gender">Gender (Display only):</label>
+<input type="text" id="gender" value="<%= gender %>" readonly>
+</div>
+
+<div class="form-group">
+<label for="mobileNumber">Mobile Number *:</label>
+<input type="text" id="mobileNumber" name="mobileNumber" value="<%=
+mobileNumber %>"
+pattern="[0-9]{10}" title="10 digit mobile number" required>
+</div>
+
+<div class="form-group">
+
+<label for="collegeName">College Name (Display only):</label>
+<input type="text" id="collegeName" value="<%= collegeName %>" readonly>
+</div>
+
+<div class="form-group">
+<label for="academicYear">Academic Year *:</label>
+<select id="academicYear" name="academicYear" required>
+<option value="2023" <%= "2023".equals(academicYear) ? "selected" : ""
+%>>2023</option>
+<option value="2024" <%= "2024".equals(academicYear) ? "selected" : ""
+%>>2024</option>
+<option value="2025" <%= "2025".equals(academicYear) ? "selected" : ""
+%>>2025</option>
+<option value="2026" <%= "2026".equals(academicYear) ? "selected" : ""
+%>>2026</option>
+</select>
+</div>
+
+<div class="button-group">
+<input type="submit" class="btn-primary" value="Update Student">
+<a href="searchStudent.jsp" class="btn btn-secondary">Back to Search</a>
+</div>
+</form>
+</div>
+</body>
+</html>
+SearchStudent.java
+package EXP6;
+
+import java.io.*;
+import javax.servlet.*;
+
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.sql.*;
+
+@WebServlet("/SearchStudent")
+public class SearchStudent extends HttpServlet {
+
+private static final String URL = "jdbc:mysql://localhost:3306/studentdb";
+private static final String USERNAME = "root";
+private static final String PASSWORD = "root"; // Change to your MySQL password
+
+protected void doPost(HttpServletRequest request, HttpServletResponse response)
+throws ServletException, IOException {
+
+String rollNumber = request.getParameter("rollNumber");
+
+Connection conn = null;
+PreparedStatement pstmt = null;
+ResultSet rs = null;
+
+try {
+Class.forName("com.mysql.cj.jdbc.Driver");
+conn = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+
+String sql = "SELECT * FROM students WHERE RollNumber = ?";
+pstmt = conn.prepareStatement(sql);
+pstmt.setString(1, rollNumber);
+rs = pstmt.executeQuery();
+
+if (rs.next()) {
+// Student found - set attributes and forward to JSP
+request.setAttribute("rollNumber", rs.getString("RollNumber"));
+request.setAttribute("firstName", rs.getString("FirstName"));
+request.setAttribute("lastName", rs.getString("LastName"));
+request.setAttribute("gender", rs.getString("Gender"));
+request.setAttribute("mobileNumber", rs.getString("MobileNumber"));
+request.setAttribute("collegeName", rs.getString("CollegeName"));
+request.setAttribute("academicYear", rs.getString("AcademicYear"));
+
+RequestDispatcher dispatcher =
+request.getRequestDispatcher("updateStudent.jsp");
+dispatcher.forward(request, response);
+} else {
+request.setAttribute("error", "Student with Roll Number '" + rollNumber + "' not
+found!");
+RequestDispatcher dispatcher =
+request.getRequestDispatcher("searchStudent.jsp");
+dispatcher.forward(request, response);
+}
+
+} catch (Exception e) {
+e.printStackTrace();
+request.setAttribute("error", "Database error: " + e.getMessage());
+RequestDispatcher dispatcher = request.getRequestDispatcher("searchStudent.jsp");
+dispatcher.forward(request, response);
+} finally {
+try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }
+try { if (pstmt != null) pstmt.close(); } catch (SQLException e) { e.printStackTrace(); }
+try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
+
+}
+}
+
+protected void doGet(HttpServletRequest request, HttpServletResponse response)
+throws ServletException, IOException {
+response.sendRedirect("searchStudent.jsp");
+}
+}
+UpdateStudent.java
+package EXP6;
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.sql.*;
+
+@WebServlet("/UpdateStudent")
+public class UpdateStudent extends HttpServlet {
+
+private static final long serialVersionUID = 1L;
+// Database connection details
+private static final String URL = "jdbc:mysql://localhost:3306/studentdb";
+private static final String USERNAME = "root";
+private static final String PASSWORD = "root"; // Change this
+
+protected void doPost(HttpServletRequest request, HttpServletResponse response)
+throws ServletException, IOException {
+
+// Get parameters from form
+
+String rollNumber = request.getParameter("rollNumber");
+String firstName = request.getParameter("firstName");
+String mobileNumber = request.getParameter("mobileNumber");
+String academicYear = request.getParameter("academicYear");
+
+Connection conn = null;
+PreparedStatement pstmt = null;
+
+try {
+// Load MySQL driver and create connection
+Class.forName("com.mysql.cj.jdbc.Driver");
+conn = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+
+// Update student information
+String sql = "UPDATE students SET FirstName = ?, MobileNumber = ?, AcademicYear =
+? WHERE RollNumber = ?";
+pstmt = conn.prepareStatement(sql);
+pstmt.setString(1, firstName);
+pstmt.setString(2, mobileNumber);
+pstmt.setString(3, academicYear);
+pstmt.setString(4, rollNumber);
+
+int rowsAffected = pstmt.executeUpdate();
+
+if (rowsAffected > 0) {
+// Update successful
+response.sendRedirect("searchStudent.jsp?success=true");
+} else {
+// Update failed
+request.setAttribute("error", "Failed to update student information!");
+
+RequestDispatcher dispatcher =
+request.getRequestDispatcher("searchStudent.jsp");
+dispatcher.forward(request, response);
+}
+
+} catch (Exception e) {
+e.printStackTrace();
+request.setAttribute("error", "Database error: " + e.getMessage());
+RequestDispatcher dispatcher = request.getRequestDispatcher("searchStudent.jsp");
+dispatcher.forward(request, response);
+} finally {
+// Close resources
+try { if (pstmt != null) pstmt.close(); } catch (SQLException e) { e.printStackTrace(); }
+try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
+}
+}
+}
+
+
